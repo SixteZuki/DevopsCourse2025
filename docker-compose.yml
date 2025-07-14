@@ -1,0 +1,38 @@
+version: "3.8"
+
+services:
+  yuval_pgsql:
+    image: postgres:15
+    container_name: yuval_postgres
+    restart: on-failure
+    environment:
+      POSTGRES_DB: yuval_db
+      POSTGRES_USER: yuval_user
+      POSTGRES_PASSWORD: yuval_pass
+    volumes:
+      - yuval_pgdata:/var/lib/postgresql/data
+    networks:
+      - yuval_network
+
+  yuval_drupal:
+    image: drupal:10
+    container_name: yuval_drupal
+    restart: on-failure
+    ports:
+      - "8888:80"
+    environment:
+      DRUPAL_DB_HOST: yuval_pgsql
+      DRUPAL_DB_NAME: yuval_db
+      DRUPAL_DB_USER: yuval_user
+      DRUPAL_DB_PASSWORD: yuval_pass
+    depends_on:
+      - yuval_pgsql
+    networks:
+      - yuval_network
+
+volumes:
+  yuval_pgdata:
+
+networks:
+  yuval_network:
+    driver: bridge
